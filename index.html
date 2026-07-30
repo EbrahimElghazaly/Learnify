@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5" />
+    <meta name="theme-color" content="#0a0a1a" />
+    <title>🚀 منصة تعلمي - Full Stack</title>
+    <link rel="stylesheet" href="style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet" />
+</head>
+
+<body>
+    <!-- ===== الخلفية ===== -->
+    <div class="bg-layer">
+        <div class="grid-overlay"></div>
+        <div class="aurora aurora-1"></div>
+        <div class="aurora aurora-2"></div>
+        <div class="aurora aurora-3"></div>
+        <canvas id="starCanvas"></canvas>
+        <div class="scanline"></div>
+    </div>
+
+    <!-- ===== الشريط الجانبي ===== -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <span class="logo-icon neon-text">🚀</span>
+                <span class="logo-text">تعلمي</span>
+                <span class="logo-badge">∞</span>
+            </div>
+            <button class="close-sidebar" id="closeSidebar">✕</button>
+        </div>
+
+        <div class="sidebar-user">
+            <div class="user-avatar" id="userAvatar">
+                👨‍💻
+                <div class="avatar-ring"></div>
+            </div>
+            <div class="user-info-text">
+                <span class="user-name" id="sidebarUserName"> إبراهيم الغزالي</span>
+                <span class="user-streak">🔥 <span id="sidebarStreak">0</span> يوم</span>
+            </div>
+        </div>
+
+        <div class="sidebar-nav">
+            <a href="#" class="nav-item active" data-page="dashboard">
+                <span class="nav-icon">📊</span>
+                <span class="nav-text">لوحة التحكم</span>
+                <span class="nav-badge" id="navDayBadge">1</span>
+            </a>
+            <a href="#" class="nav-item" data-page="roadmap">
+                <span class="nav-icon">🗺️</span>
+                <span class="nav-text">الخريطة</span>
+                <span class="nav-progress" id="navRoadmapProgress">0%</span>
+            </a>
+            <a href="#" class="nav-item" data-page="progress">
+                <span class="nav-icon">📈</span>
+                <span class="nav-text">سجل التقدم</span>
+            </a>
+            <a href="#" class="nav-item" data-page="notes">
+                <span class="nav-icon">📝</span>
+                <span class="nav-text">ملاحظاتي</span>
+                <span class="nav-badge" id="navNotesBadge">0</span>
+            </a>
+            <a href="#" class="nav-item" data-page="projects">
+                <span class="nav-icon">💻</span>
+                <span class="nav-text">مشاريعي</span>
+            </a>
+            <a href="#" class="nav-item" data-page="skills">
+                <span class="nav-icon">🧠</span>
+                <span class="nav-text">مهاراتي</span>
+            </a>
+            <a href="#" class="nav-item" data-page="achievements">
+                <span class="nav-icon">🏆</span>
+                <span class="nav-text">إنجازاتي</span>
+                <span class="nav-badge" id="navAchievementsBadge">0</span>
+            </a>
+            <a href="#" class="nav-item" data-page="calendar">
+                <span class="nav-icon">📅</span>
+                <span class="nav-text">التقويم</span>
+            </a>
+            <a href="#" class="nav-item" data-page="statistics">
+                <span class="nav-icon">📉</span>
+                <span class="nav-text">الإحصائيات</span>
+            </a>
+            <a href="#" class="nav-item" data-page="settings">
+                <span class="nav-icon">⚙️</span>
+                <span class="nav-text">الإعدادات</span>
+            </a>
+    </nav>
+
+    <div class="sidebar-footer">
+        <button class="logout-btn" id="logoutBtn">🚪 تسجيل الخروج</button>
+    </div>
+    </nav>
+
+    <!-- ===== المحتوى الرئيسي ===== -->
+    <main class="main-content">
+        <!-- الهيدر -->
+        <header class="top-header" id="topHeader">
+            <button class="menu-toggle" id="menuToggle">☰</button>
+
+            <div class="header-search">
+                <span class="search-icon">🔍</span>
+                <input type="text" placeholder="ابحث..." id="searchInput" />
+                <span class="search-glow"></span>
+            </div>
+
+            <div class="header-actions">
+                <span class="header-date" id="headerDate"></span>
+                <button class="icon-btn" id="themeToggle">🌙</button>
+                <button class="icon-btn" id="notificationBtn">
+                    🔔
+                    <span class="notification-badge" id="notifBadge">0</span>
+                </button>
+                <button class="icon-btn" id="fullscreenBtn">⛶</button>
+            </div>
+        </header>
+
+        <!-- ===== الصفحات ===== -->
+        <div class="page-container">
+
+            <!-- ====== لوحة التحكم ====== -->
+            <section class="page active" id="page-dashboard">
+                <!-- الترحيب -->
+                <div class="welcome-card">
+                    <div class="welcome-content">
+                        <div class="welcome-left">
+                            <div class="welcome-avatar">
+                                <span class="welcome-emoji" id="greetingEmoji">👋</span>
+                                <div class="pulse-ring"></div>
+                                <div class="pulse-ring delay-1"></div>
+                            </div>
+                            <div>
+                                <h1>مرحباً، <span id="dashUserName">إبراهيم الغزالي</span></h1>
+                                <p class="welcome-sub">اليوم <strong id="dashDay">1</strong> من <strong>180</strong></p>
+                            </div>
+                        </div>
+                        <div class="welcome-right">
+                            <div class="welcome-stat">
+                                <span class="ws-value" id="wsDays">0</span>
+                                <span class="ws-label">أيام</span>
+                            </div>
+                            <div class="welcome-stat">
+                                <span class="ws-value" id="wsHours">0</span>
+                                <span class="ws-label">ساعات</span>
+                            </div>
+                            <div class="welcome-stat">
+                                <span class="ws-value" id="wsStreak">0</span>
+                                <span class="ws-label">🔥 متتالية</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="welcome-glow"></div>
+                </div>
+
+                <!-- شريط التقدم -->
+                <div class="progress-card">
+                    <div class="progress-header">
+                        <div>
+                            <span class="progress-title">📊 التقدم العام</span>
+                            <span class="progress-subtitle">رحلة الـ 180 يوم لتعلم ال Full-Stack</span>
+                        </div>
+                        <span class="progress-percent" id="mainProgress">0%</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-track-glow"></div>
+                        <div class="progress-fill" id="mainProgressFill" style="width:0%">
+                            <span class="progress-fill-text" id="progressFillText">0%</span>
+                        </div>
+                    </div>
+                    <div class="progress-meta">
+                        <span>✅ مكتمل: <strong id="completedDaysCount">0</strong></span>
+                        <span>⏳ متبقي: <strong id="remainingDaysCount">180</strong></span>
+                        <span>📈 نسبة اليوم: <strong id="dailyPercent">0%</strong></span>
+                    </div>
+                    <div class="progress-milestones">
+                        <span class="milestone" data-value="25">🏁 25</span>
+                        <span class="milestone" data-value="50">🏁 50</span>
+                        <span class="milestone" data-value="75">🏁 75</span>
+                        <span class="milestone" data-value="100">🏁 100</span>
+                        <span class="milestone" data-value="150">🏁 150</span>
+                        <span class="milestone active" data-value="180">🏆 180</span>
+                    </div>
+                </div>
+
+                <!-- تعلم اليوم -->
+                <div class="today-card">
+                    <div class="today-header">
+                        <div>
+                            <h2>📚 تعلم اليوم</h2>
+                            <p class="today-subtitle">تفاصيل درس اليوم</p>
+                        </div>
+                        <button class="btn btn-success" id="completeDayBtn">
+                            ✔️ أنهيت اليوم
+                            <span class="btn-shine"></span>
+                        </button>
+                    </div>
+                    <div class="today-content" id="todayContent">
+                        <!-- يتعبأ بالجافا سكريبت -->
+                    </div>
+                </div>
+
+                <!-- الشبكة السفلية -->
+                <div class="dashboard-grid">
+                    <div class="recent-card">
+                        <h3>🕐 آخر النشاطات</h3>
+                        <div id="recentActivities">
+                            <p class="empty-state">لا توجد نشاطات</p>
+                        </div>
+                    </div>
+                    <div class="skills-mini-card">
+                        <h3>🧠 أبرز المهارات</h3>
+                        <div id="miniSkills">
+                            <p class="empty-state">لا توجد مهارات</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== باقي الصفحات ====== -->
+            <section class="page" id="page-roadmap">
+                <div class="page-header">
+                    <h2>🗺️ الخريطة الدراسية</h2>
+                </div>
+                <div id="roadmapContainer"></div>
+            </section>
+
+            <section class="page" id="page-progress">
+                <div class="page-header">
+                    <h2>📈 سجل التقدم</h2>
+                    <button class="btn btn-primary" id="addProgressBtn">➕ إضافة</button>
+                </div>
+                <div class="progress-log" id="progressLog">
+                    <p class="empty-state">لا يوجد تقدم</p>
+                </div>
+            </section>
+
+            <section class="page" id="page-notes">
+                <div class="page-header">
+                    <h2>📝 ملاحظاتي</h2>
+                    <span id="notesCount">0</span>
+                </div>
+                <div class="notes-area">
+                    <textarea id="noteInput" placeholder="📝 اكتب ملاحظتك..." rows="3"></textarea>
+                    <div class="note-tools">
+                        <input type="text" id="noteTag" placeholder="🏷️ تصنيف" />
+                        <button class="btn btn-primary" id="addNoteBtn">➕ إضافة</button>
+                    </div>
+                    <div id="notesList"></div>
+                </div>
+            </section>
+
+            <section class="page" id="page-projects">
+                <div class="page-header">
+                    <h2>💻 مشاريعي</h2>
+                </div>
+                <div class="projects-area">
+                    <div class="project-form">
+                        <input type="text" id="projectName" placeholder="اسم المشروع" />
+                        <select id="projectStatus">
+                            <option value="pending">⏳ قيد التنفيذ</option>
+                            <option value="completed">✅ مكتمل</option>
+                            <option value="planned">📋 مخطط</option>
+                        </select>
+                        <button class="btn btn-success" id="addProjectBtn">➕ إضافة</button>
+                    </div>
+                    <div id="projectsList"></div>
+                </div>
+            </section>
+
+            <section class="page" id="page-skills">
+                <div class="page-header">
+                    <h2>🧠 مهاراتي</h2>
+                    <span id="skillsAvg">0%</span>
+                </div>
+                <div id="skillsContainer"></div>
+            </section>
+
+            <section class="page" id="page-achievements">
+                <div class="page-header">
+                    <h2>🏆 إنجازاتي</h2>
+                    <span id="achievementsCount">0</span>
+                </div>
+                <div id="achievementsContainer"></div>
+            </section>
+
+            <section class="page" id="page-calendar">
+                <div class="page-header">
+                    <h2>📅 التقويم</h2>
+                </div>
+                <div class="calendar-box">
+                    <div class="calendar-controls">
+                        <button class="btn btn-sm" id="prevMonth">◀</button>
+                        <span id="calMonthYear"></span>
+                        <button class="btn btn-sm" id="nextMonth">▶</button>
+                        <button class="btn btn-sm btn-outline" id="todayCal">📅 اليوم</button>
+                    </div>
+                    <div class="calendar-grid" id="calendarGrid"></div>
+                </div>
+            </section>
+
+            <section class="page" id="page-statistics">
+                <div class="page-header">
+                    <h2>📉 الإحصائيات</h2>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <h3>⏱️ ساعات المذاكرة</h3>
+                        <div class="chart-bars" id="hoursChart"></div>
+                    </div>
+                    <div class="stat-box">
+                        <h3>🧠 توزيع المهارات</h3>
+                        <div id="skillsDonut"></div>
+                    </div>
+                    <div class="stat-box">
+                        <h3>📊 ملخص سريع</h3>
+                        <div id="quickStats"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="page" id="page-settings">
+                <div class="page-header">
+                    <h2>⚙️ الإعدادات</h2>
+                </div>
+                <div class="settings-box">
+                    <div class="setting-row">
+                        <label>👤 الاسم</label>
+                        <input type="text" id="settingsName" />
+                        <button class="btn btn-primary" id="saveSettings">💾 حفظ</button>
+                    </div>
+                    <div class="setting-row">
+                        <label>📤 البيانات</label>
+                        <button class="btn btn-outline" id="exportBtn">📥 تصدير</button>
+                        <button class="btn btn-outline" id="importBtn">📤 استيراد</button>
+                        <input type="file" id="importFile" accept=".json" style="display:none" />
+                    </div>
+                    <div class="setting-row">
+                        <label>🗑️ إدارة</label>
+                        <button class="btn btn-danger" id="resetBtn">🗑️ حذف الكل</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- ===== نافذة الإشعارات ===== -->
+    <div class="notif-panel" id="notifPanel">
+        <div class="notif-header">
+            <span>🔔 الإشعارات</span>
+            <button id="closeNotif">✕</button>
+        </div>
+        <div id="notifList"></div>
+    </div>
+
+    <!-- ===== نافذة إضافة تقدم ===== -->
+    <div class="modal" id="progressModal">
+        <div class="modal-box">
+            <button class="modal-close" id="closeProgressModal">✕</button>
+            <h2>📈 إضافة تقدم</h2>
+            <form id="progressForm">
+                <label>📚 المادة</label>
+                <input type="text" id="pTopic" placeholder="مثال: JavaScript Arrays" required />
+                <label>⏱️ الساعات</label>
+                <input type="number" id="pHours" min="0.5" step="0.5" placeholder="2" required />
+                <label>📝 ملاحظات</label>
+                <textarea id="pNotes" placeholder="ما الذي تعلمته؟"></textarea>
+                <button class="btn btn-success" type="submit">💾 حفظ</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
