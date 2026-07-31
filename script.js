@@ -30,14 +30,14 @@ const defaultData = {
     lastStudyDate: null,
     theme: 'dark',
     notifications: [
-        { title: '🚀 مرحباً بك في منصة تعلمي Neon Galaxy!', time: new Date().toISOString() }
+        { title: '🚀 مرحباً بك في منصة تعلمي!', time: new Date().toISOString() }
     ],
     ratings: {},
     dailyStudyTime: {}
 };
 
 // =============================================
-// الخطة الدراسية الكاملة (180 يوم)
+// الخطة الدراسية (جميع الأيام - 180 يوم)
 // =============================================
 const roadmapData = {
     month1: {
@@ -296,11 +296,11 @@ function getToday() {
     return new Date().toISOString().split('T')[0];
 }
 
+// 🔥 الدالة المعدلة: اليوم = عدد الأيام المكتملة + 1
 function getCurrentDayNumber() {
-    const startDate = new Date(appData.startDate);
-    const now = new Date();
-    const diff = Math.floor((now - startDate) / (1000 * 60 * 60 * 24)) + 1;
-    return Math.min(diff, DAYS_TOTAL);
+    const completed = getCompletedDays().length;
+    const nextDay = completed + 1;
+    return Math.min(nextDay, DAYS_TOTAL);
 }
 
 function getTodayLesson() {
@@ -310,8 +310,8 @@ function getTodayLesson() {
 }
 
 function getProgressPercentage() {
-    const dayNum = getCurrentDayNumber();
-    return Math.round((dayNum / DAYS_TOTAL) * 100);
+    const completed = getCompletedDays().length;
+    return Math.round((completed / DAYS_TOTAL) * 100);
 }
 
 function getCompletedDays() {
@@ -374,7 +374,7 @@ function renderDashboard() {
     const todayLesson = getTodayLesson();
     const progress = getProgressPercentage();
     const completed = getCompletedDays().length;
-    const remaining = DAYS_TOTAL - dayNum;
+    const remaining = DAYS_TOTAL - completed;
     const streak = getStreak();
     const totalHours = appData.progressEntries.reduce((sum, p) => sum + (p.hours || 0), 0);
 
@@ -408,7 +408,7 @@ function renderDashboard() {
     // المعالم
     document.querySelectorAll('.milestone').forEach(el => {
         const val = parseInt(el.dataset.value);
-        if (dayNum >= val) el.classList.add('active');
+        if (completed >= val) el.classList.add('active');
         else el.classList.remove('active');
     });
 
@@ -509,13 +509,11 @@ function renderDashboard() {
         `).join('');
     }
 
-    // البادجات
     document.getElementById('navNotesBadge').textContent = appData.notes.length;
     document.getElementById('navAchievementsBadge').textContent = appData.achievements.length;
     document.getElementById('notesCount').textContent = appData.notes.length;
     document.getElementById('achievementsCount').textContent = appData.achievements.length;
 
-    // التاريخ
     const now = new Date();
     document.getElementById('headerDate').textContent = now.toLocaleDateString('ar-EG', {
         day: 'numeric', month: 'short', year: 'numeric'
@@ -525,7 +523,6 @@ function renderDashboard() {
 function renderRoadmap() {
     const container = document.getElementById('roadmapContainer');
     let html = '';
-    
     Object.values(roadmapData).forEach(month => {
         html += `<div class="roadmap-month"><h3>${month.name}</h3>`;
         month.days.forEach(day => {
@@ -540,7 +537,6 @@ function renderRoadmap() {
         });
         html += '</div>';
     });
-    
     container.innerHTML = html;
 }
 
@@ -565,7 +561,6 @@ function renderNotes() {
     const notes = appData.notes || [];
     document.getElementById('notesCount').textContent = notes.length;
     document.getElementById('navNotesBadge').textContent = notes.length;
-    
     if (notes.length === 0) {
         list.innerHTML = '<p class="empty-state">لا توجد ملاحظات</p>';
         return;
@@ -580,7 +575,6 @@ function renderNotes() {
             <button class="note-delete" data-index="${i}">🗑️</button>
         </div>
     `).join('');
-
     document.querySelectorAll('.note-delete').forEach(btn => {
         btn.addEventListener('click', function() {
             const idx = parseInt(this.dataset.index);
@@ -609,7 +603,6 @@ function renderProjects() {
             <button class="project-delete" data-index="${i}">🗑️</button>
         </div>
     `).join('');
-
     document.querySelectorAll('.project-delete').forEach(btn => {
         btn.addEventListener('click', function() {
             const idx = parseInt(this.dataset.index);
@@ -625,7 +618,6 @@ function renderSkills() {
     const container = document.getElementById('skillsContainer');
     const avg = appData.skills.reduce((s, skill) => s + skill.level, 0) / appData.skills.length;
     document.getElementById('skillsAvg').textContent = `${Math.round(avg)}%`;
-    
     container.innerHTML = appData.skills.map(skill => `
         <div class="skill-card">
             <div class="skill-header">
@@ -644,7 +636,6 @@ function renderAchievements() {
     const achievements = appData.achievements || [];
     document.getElementById('achievementsCount').textContent = achievements.length;
     document.getElementById('navAchievementsBadge').textContent = achievements.length;
-    
     if (achievements.length === 0) {
         container.innerHTML = '<p class="empty-state">لا توجد إنجازات</p>';
         return;
@@ -661,39 +652,30 @@ function renderAchievements() {
 function renderCalendar() {
     const grid = document.getElementById('calendarGrid');
     const monthYear = document.getElementById('calMonthYear');
-    
     const monthNames = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
     monthYear.textContent = `${monthNames[currentMonth]} ${currentYear}`;
-
     const firstDay = new Date(currentYear, currentMonth, 1).getDay();
     const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-    
     const weekDays = ['ح', 'ن', 'ث', 'ر', 'خ', 'ج', 'س'];
     let html = weekDays.map(d => `<div class="cal-day-header">${d}</div>`).join('');
-
     for (let i = 0; i < firstDay; i++) {
         html += `<div class="cal-day empty"></div>`;
     }
-
     const today = new Date();
     const todayStr = getToday();
     const completedDays = getCompletedDays();
-
     for (let d = 1; d <= daysInMonth; d++) {
         const dateObj = new Date(currentYear, currentMonth, d);
         const dateStr = dateObj.toISOString().split('T')[0];
         const isToday = dateStr === todayStr;
         const isStudied = completedDays.includes(d) || appData.progressEntries.some(p => p.date === dateStr);
         const isFuture = dateObj > today;
-
         let classes = 'cal-day';
         if (isToday) classes += ' today';
         if (isStudied && !isFuture) classes += ' studied';
         else if (!isFuture && !isStudied && dateObj < today) classes += ' missed';
-
         html += `<div class="${classes}">${d}</div>`;
     }
-
     grid.innerHTML = html;
 }
 
@@ -703,14 +685,12 @@ function renderStatistics() {
     const totalDays = entries.length;
     const avgHours = totalDays > 0 ? totalHours / totalDays : 0;
     const maxHours = entries.length > 0 ? Math.max(...entries.map(e => e.hours)) : 0;
-
     document.getElementById('quickStats').innerHTML = `
         <div class="qs-item"><span class="qs-label">أيام الدراسة</span><span class="qs-value">${totalDays}</span></div>
         <div class="qs-item"><span class="qs-label">إجمالي الساعات</span><span class="qs-value">${totalHours.toFixed(1)}</span></div>
         <div class="qs-item"><span class="qs-label">متوسط الساعات</span><span class="qs-value">${avgHours.toFixed(1)}</span></div>
         <div class="qs-item"><span class="qs-label">أفضل يوم</span><span class="qs-value">${maxHours.toFixed(1)} ساعة</span></div>
     `;
-
     const hoursChart = document.getElementById('hoursChart');
     const last7Days = [];
     for (let i = 6; i >= 0; i--) {
@@ -720,7 +700,6 @@ function renderStatistics() {
         const hours = entries.filter(e => e.date === str).reduce((s, e) => s + (e.hours || 0), 0);
         last7Days.push({ label: d.getDate(), hours });
     }
-
     const maxH = Math.max(...last7Days.map(d => d.hours), 1);
     hoursChart.innerHTML = last7Days.map(d => `
         <div class="bar-item">
@@ -728,7 +707,6 @@ function renderStatistics() {
             <span class="bar-label">${d.label}</span>
         </div>
     `).join('');
-
     const donut = document.getElementById('skillsDonut');
     const topSkills = appData.skills.filter(s => s.level > 0).slice(0, 6);
     const colors = ['#00d4ff', '#ff00ff', '#ff6b35', '#00ff88', '#ff0044', '#ffaa00'];
@@ -748,9 +726,7 @@ function renderNotifications() {
     const list = document.getElementById('notifList');
     const notifications = appData.notifications || [];
     const badge = document.getElementById('notifBadge');
-    
     badge.textContent = notifications.length;
-    
     if (notifications.length === 0) {
         list.innerHTML = '<p class="empty-state">لا توجد إشعارات</p>';
         return;
@@ -764,7 +740,7 @@ function renderNotifications() {
 }
 
 // =============================================
-// الأحداث
+// الأحداث والتنقل
 // =============================================
 document.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', function(e) {
@@ -830,7 +806,7 @@ document.getElementById('fullscreenBtn').addEventListener('click', () => {
 });
 
 // =============================================
-// زر "أنهيت اليوم"
+// زر "أنهيت اليوم" - المعدل
 // =============================================
 document.getElementById('completeDayBtn').addEventListener('click', function() {
     const dayNum = getCurrentDayNumber();
@@ -892,7 +868,14 @@ document.getElementById('completeDayBtn').addEventListener('click', function() {
     addNotification(`✅ أتممت اليوم ${dayNum}: ${todayLesson.topic}`);
     saveData(appData);
     renderAll();
-    alert(`🎉 مبروك! تم تسجيل اليوم ${dayNum}!\n📚 ${todayLesson.topic}`);
+    
+    const nextDay = dayNum + 1;
+    if (nextDay <= DAYS_TOTAL) {
+        const nextLesson = allDays.find(d => d.day === nextDay);
+        alert(`🎉 مبروك! تم تسجيل اليوم ${dayNum}!\n📚 الغد سيكون اليوم ${nextDay}: ${nextLesson?.topic || 'استمر في التعلم!'}`);
+    } else {
+        alert(`🎉 مبروك! لقد أتممت المسار كاملاً!`);
+    }
 });
 
 // =============================================
@@ -910,19 +893,16 @@ document.getElementById('progressForm').addEventListener('submit', function(e) {
     const topic = document.getElementById('pTopic').value.trim();
     const hours = parseFloat(document.getElementById('pHours').value);
     const notes = document.getElementById('pNotes').value.trim();
-
     if (!topic || !hours) {
         alert('الرجاء إدخال جميع البيانات');
         return;
     }
-
     appData.progressEntries.push({
         date: getToday(),
         topic: topic,
         hours: hours,
         notes: notes
     });
-
     const skillMap = {
         'HTML': ['HTML'], 'CSS': ['CSS'], 'JavaScript': ['JavaScript'],
         'Git': ['Git'], 'Bootstrap': ['Bootstrap'], 'C#': ['C#'],
@@ -934,7 +914,6 @@ document.getElementById('progressForm').addEventListener('submit', function(e) {
             skills.forEach(s => updateSkillLevel(s, 3));
         }
     }
-
     saveData(appData);
     this.reset();
     document.getElementById('progressModal').classList.remove('open');
@@ -949,12 +928,10 @@ document.getElementById('progressForm').addEventListener('submit', function(e) {
 document.getElementById('addNoteBtn').addEventListener('click', function() {
     const text = document.getElementById('noteInput').value.trim();
     const tag = document.getElementById('noteTag').value.trim();
-
     if (!text) {
         alert('الرجاء كتابة الملاحظة');
         return;
     }
-
     appData.notes.push({ text, tag: tag || null, date: new Date().toISOString() });
     saveData(appData);
     document.getElementById('noteInput').value = '';
@@ -970,12 +947,10 @@ document.getElementById('addNoteBtn').addEventListener('click', function() {
 document.getElementById('addProjectBtn').addEventListener('click', function() {
     const name = document.getElementById('projectName').value.trim();
     const status = document.getElementById('projectStatus').value;
-
     if (!name) {
         alert('الرجاء إدخال اسم المشروع');
         return;
     }
-
     appData.projects.push({ name, status });
     saveData(appData);
     document.getElementById('projectName').value = '';
@@ -1074,7 +1049,6 @@ document.getElementById('searchInput').addEventListener('input', function() {
         renderPage(currentPage);
         return;
     }
-
     const notes = appData.notes || [];
     const filtered = notes.filter(n => n.text.toLowerCase().includes(query) || (n.tag && n.tag.toLowerCase().includes(query)));
     const list = document.getElementById('notesList');
@@ -1106,20 +1080,18 @@ document.getElementById('logoutBtn').addEventListener('click', function() {
 });
 
 // =============================================
-// نجوم متحركة (Canvas)
+// نجوم متحركة
 // =============================================
 function initStars() {
     const canvas = document.getElementById('starCanvas');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    
     function resize() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
     }
     resize();
     window.addEventListener('resize', resize);
-
     const stars = [];
     const numStars = 150;
     for (let i = 0; i < numStars; i++) {
@@ -1131,7 +1103,6 @@ function initStars() {
             angle: Math.random() * Math.PI * 2
         });
     }
-
     function animate() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         stars.forEach(star => {
@@ -1142,14 +1113,11 @@ function initStars() {
             if (star.x < 0) star.x = canvas.width;
             if (star.y > canvas.height) star.y = 0;
             if (star.y < 0) star.y = canvas.height;
-            
             const alpha = 0.3 + Math.sin(star.angle) * 0.3 + 0.3;
             ctx.beginPath();
             ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
             ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
             ctx.fill();
-            
-            // Glow
             ctx.shadowColor = 'rgba(0, 212, 255, 0.3)';
             ctx.shadowBlur = 8;
         });
@@ -1169,7 +1137,6 @@ function renderAll() {
             el.textContent = appData.user.name || 'إبراهيم';
         }
     });
-
     if (appData.theme === 'light') {
         document.documentElement.setAttribute('data-theme', 'light');
         document.getElementById('themeToggle').textContent = '🌙';
@@ -1177,12 +1144,10 @@ function renderAll() {
         document.documentElement.setAttribute('data-theme', 'dark');
         document.getElementById('themeToggle').textContent = '☀️';
     }
-
     const now = new Date();
     document.getElementById('headerDate').textContent = now.toLocaleDateString('ar-EG', {
         day: 'numeric', month: 'short', year: 'numeric'
     });
-
     renderPage(currentPage);
     renderNotifications();
 }
@@ -1197,9 +1162,10 @@ setInterval(() => {
     renderAll();
 }, 30000);
 
-console.log('🚀 منصة تعلمي - Neon Galaxy Edition');
-console.log('✨ تصميم خرافي بمستوى مختلف');
-console.log('🌌 خلفية نجوم متحركة + Aurora Effects');
-console.log('📅 اليوم:', getCurrentDayNumber(), 'من 180');
+console.log('🚀 منصة تعلمي - Full Stack .NET');
+console.log('📅 اليوم الحالي:', getCurrentDayNumber(), 'من 180');
 console.log('📊 التقدم:', getProgressPercentage(), '%');
+console.log('✅ الأيام المكتملة:', getCompletedDays().length);
 console.log('🔥 Streak:', getStreak(), 'يوم');
+console.log('📝 ملاحظات:', appData.notes.length);
+console.log('🏆 إنجازات:', appData.achievements.length);
